@@ -1,0 +1,21 @@
+# docker-compose for standard creating iris container without image built
+# hma, 2023-07-06
+services:
+    iris:
+        build: ./image-iris
+        environment:
+            IRIS_USERNAME: superuser
+            IRIS_PASSWORD: SYS
+        hostname: 2024demo
+        container_name: mpidemo
+        ports:
+            - 1980:1972 
+            - 52880:52773
+        command: 
+            - -a
+            - iris session iris -U%SYS '##class(Security.Users).UnExpireUserPasswords("*")'
+            - --check-caps false
+            - --log /usr/irissys/mgr/messages.log
+        
+    
+

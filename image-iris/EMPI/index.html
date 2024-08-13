@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者信息注册</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #00a99d;
+            /* Blue-green background */
+            text-align: center;
+            color: #ffffff;
+            /* White text color */
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            /* Light gray background */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #007bff;
+            /* Zoho.com blue color */
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input[type="button"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+
+        .patient-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            /* 默认隐藏模态框 */
+            position: fixed;
+            /* 固定在视口 */
+            z-index: 1;
+            /* 置于其他元素之上 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* 全屏宽 */
+            height: 100%;
+            /* 全屏高 */
+            overflow: auto;
+            /* 允许滚动 */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* 遮罩层背景色 */
+        }
+
+        /* 模态框内容样式 */
+        .modal-content {
+            background-color: #00a99d;
+            margin: 15% auto;
+            /* 垂直居中，水平居中 */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 100%;
+            /* 宽度可以是固定的，也可以是百分比 */
+        }
+
+        /* 关闭按钮样式 */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 表格样式 */
+        .table {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .cell {
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        /* 操作按钮样式 */
+        .modal-actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="./scripts/dist.js"> </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1><span class="patient-icon">👤</span>患者信息</h1>
+        <form>
+            <label for="stock">读取已向量化患者</label>
+            <select id="stock" name="stock" onchange="loadPatientInfo()">
+                <option value=""></option>
+            </select>
+
+            <label for="threhold">相似度阈值(%)：</label>
+            <input type="text" id="threhold" name="threhold" value="20" required />
+
+            <label for="lastName">姓：</label>
+            <input type="text" id="lastName" name="lastName" value="张" required>
+            <label for="firstName">名：</label>
+            <input type="text" id="firstName" name="firstName" value="三" required>
+
+            <label for="gender">性别：</label>
+            <select id="gender" name="gender">
+                <option value="male">男性</option>
+                <option value="female">女性</option>
+                <option value=""></option>
+            </select>
+
+            <label for="birthdate">出生日期：</label>
+            <input type="date" id="birthdate" name="birthdate" value="1990-01-01" required>
+
+            <label for="address">住址：</label>
+            <input type="text" id="address" name="address" value="北京市朝阳区" required>
+
+            <label for="phoneNumber">电话号码：</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" value="13571072756" required>
+
+            <label for="idNumber">身份证号码：</label>
+            <input type="text" id="idNumber" name="idNumber" value="110101199001010001" required>
+
+            <label for="insuranceCard">医保卡号码：</label>
+            <input type="text" id="insuranceCard" name="insuranceCard" value="1234567890" required>
+
+            <input type="button" value="提交" id="triggerButton">
+        </form>
+    </div>
+    <!-- 信息提示页模态框 -->
+    <div id="EMPIInfo" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal()">&times;</span>
+            <span id="patInfo"></span>
+            <h2>相似患者清单</h2>
+            <!-- 使用<ul>实现的表格 -->
+            <ul class="table" id="patList">
+                <li class="row">
+                    <span class="cell">资源ID</span>
+                    <span class="cell">患者信息摘要</span>
+                    <span class="cell">相似度</span>
+                </li>
+            </ul>
+
+            <!-- 合并、保存、取消按钮 -->
+            <div class="modal-actions">
+                <!--<input type="button" value="合并" id="mergeBtn">-->
+                <input type="button" value="保存" id="saveBtn" onclick="addPatient()">
+                <input type="button" value="取消" id="cancelBtn" onclick="hideModal()">
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const empiUrl = 'http://192.168.98.188/api/EMPI/Patient';
+    const fhirEndpoint = 'http://192.168.98.188/csp/healthshare/fhirserver/fhir/r4';
+    var similarPatients = [];
+    var patientData;
+    var patientSummary;
+    //页面加载完成后先读存量的Embedded患者
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const apiUrl = 'http://192.168.98.188/api/EMPI/PatientIds';
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 在这里处理你的数据，例如将其显示在页面上
+                var idList = document.getElementById('stock');
+                for (var item of data) {
+                    var newOption = document.createElement("option");
+                    // 设置option的文本和值  
+                    newOption.text = item;
+                    newOption.value = item;
+                    // 将新的option添加到select中  
+                    idList.add(newOption);
+                }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    });
+
+    // 获取模态框和按钮元素  
+    var modal = document.getElementById("EMPIInfo");
+    var span = document.getElementsByClassName("close")[0];
+    document.getElementById('triggerButton').addEventListener('click', function () {
+        clearTable();
+        patientData = {
+            Name: document.getElementById('lastName').value + document.getElementById('firstName').value,
+            Gender: document.getElementById('gender').value,
+            DOB: document.getElementById('birthdate').value,
+            Address: document.getElementById('address').value,
+            PhoneNumber: document.getElementById('phoneNumber').value,
+            IdNumber: document.getElementById('idNumber').value,
+            InsuranceNumber: document.getElementById('insuranceCard').value,
+            Threhold: document.getElementById('threhold').value
+        };
+        patientSummary = patientData.Name + "," + getGenderString(patientData.Gender) + "," + patientData.DOB
+            + ",地址：" + patientData.Address + ",电话：" + patientData.PhoneNumber + ",身份证号码：" + patientData.IdNumber + ",医保卡号码：" + patientData.InsuranceNumber
+        console.log(patientSummary)
+        // 使用fetch API发送POST请求  
+        fetch(empiUrl, {
+            method: 'POST', // 或者 'put'  
+            headers: {
+                'Content-Type': 'application/json', // 告诉服务器你发送的是JSON  
+            },
+            body: JSON.stringify(patientData), // 使用JSON.stringify()将数据转换为JSON字符串  
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // 解析响应体为JSON  
+            })
+            .then(data => {
+                handleEMPIResponse(data);
+                showModal();
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        // 显示提示页  
+        //document.getElementById('modal').style.display = 'block';
+    });
+
+    // 显示模态框的函数  
+    function showModal() {
+        modal.style.display = "block";
+    }
+
+    // 隐藏模态框的函数  
+    function hideModal() {
+        clearTable();
+        document.getElementById('patInfo').innerText = ""
+        modal.style.display = "none";
+    }
+
+    function handleEMPIResponse(data) {
+        var patInfoBox = document.getElementById('patInfo')
+        patInfoBox.innerText = patientSummary
+        for (var item of data) {
+            addPatRow(item);
+        }
+    }
+
+    function addPatRow(item) {
+        // 创建一个新的行元素  
+        var newRow = document.createElement('li');
+        newRow.classList.add('row');
+
+        // 创建三个新的列元素  
+        var newCellID = document.createElement('span');
+        newCellID.classList.add('cell');
+        newCellID.textContent = item.ResourceId;
+
+        var newCellSummary = document.createElement('span');
+        newCellSummary.classList.add('cell');
+        newCellSummary.textContent = item.DemographicSummary;
+
+        var newCellSimilarity = document.createElement('span');
+        newCellSimilarity.classList.add('cell');
+        newCellSimilarity.textContent = formatDecimalToPercent((0 + item.Similarity));
+
+        //item.Similarity;
+
+        // 将新的列元素添加到行元素中  
+        newRow.appendChild(newCellID);
+        newRow.appendChild(newCellSummary);
+        newRow.appendChild(newCellSimilarity);
+
+        // 将新的行元素添加到表格中  
+        var table = document.querySelector('.table');
+        table.appendChild(newRow);
+    }
+
+    function clearTable() {
+        // 获取<ul>元素  
+        var ul = document.getElementById('patList');
+
+        // 获取所有的<li>元素  
+        var lis = ul.getElementsByTagName('li');
+
+        // 从第二个<li>开始遍历（索引为1，因为数组/NodeList是从0开始的）  
+        for (var i = 1; i < lis.length; i++) {
+            // 移除当前<li>元素  
+            ul.removeChild(lis[i]);
+        }
+    }
+
+    function formatDecimalToPercent(decimal) {
+        console.log(decimal)
+        // 乘以100并保留两位小数（如果需要）  
+        var percent = (decimal * 100).toFixed(2);
+
+        // 添加百分比符号  
+        return percent + '%';
+    }
+
+    function getGenderString(code) {
+        str = "";
+        switch (code) {
+            case "male":
+                str = '男性';
+                break;
+            case "female":
+                str = '女性';
+                break;
+            default:
+                str = '';
+                break;
+        }
+        return str;
+    }
+
+    function loadPatientInfo() {
+        var selectElement = document.getElementById('stock');
+        // 获取被选中的option元素  
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        // 获取被选中option的value属性值  
+        var pid = selectedOption.value;
+        // 通过FHIR接口获得响应
+        var url = fhirEndpoint + "/Patient/" + pid;
+        return fetch(url, {
+            method: 'GET', // 或者 'put'  
+            headers: {
+                'Content-Type': 'application/json', // 告诉服务器你发送的是JSON  
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // 解析响应体为JSON  
+            })
+            .then(data => {
+                console.log(data);
+                const pat = data;
+                document.getElementById("lastName").value = pat.name[0].family
+                document.getElementById("firstName").value = pat.name[0].given[0]
+                document.getElementById("gender").value = pat.gender
+                document.getElementById("birthdate").value = pat.birthDate
+                document.getElementById("address").value = pat.address[0].text
+                document.getElementById("phoneNumber").value = pat.telecom[0].value
+                var ids = pat.identifier
+                for (var item of ids) {
+                    if ("身份证号码" == item.type.text) {
+                        document.getElementById("idNumber").value = item.value
+                        continue;
+                    }
+                    if ("医保卡号码" == item.type.text) {
+                        document.getElementById("insuranceCard").value = item.value
+                        continue;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function addPatient() {
+        var patient = makePatientRes();
+        console.log(JSON.stringify(patient));
+        var postPatUrl = fhirEndpoint + "/Patient"
+        fetch(postPatUrl, {
+            method: 'POST', // 或者 'put'  
+            headers: {
+                'Content-Type': 'application/fhir+json; charset=UTF-8', // 告诉服务器你发送的是JSON  
+            },
+            body: JSON.stringify(patient), // 使用JSON.stringify()将数据转换为JSON字符串  
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                // 获取响应头中的某个字段  
+                const contentType = response.headers.get('Location');
+                console.log('Content-Type:', contentType);
+
+                // 或者，获取响应头中所有字段的键  
+                for (let key of response.headers.keys()) {
+                    console.log(key + ': ' + response.headers.get(key));
+                }
+                alert("患者"+patient.name[0].family+patient.name[0].given[0]+"信息保存成功")
+                return response; // 解析响应体为JSON  
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function makePatientRes() {
+        var patient = {
+            "resourceType": "Patient",
+            "address": [
+                {
+                    "text": document.getElementById("address").value
+                }
+            ],
+            "gender": document.getElementById("gender").value,
+            "birthDate": document.getElementById("birthdate").value,
+            "identifier": [
+                {
+                    "type": {
+                        "text": "身份证号码"
+                    },
+                    "value": document.getElementById("idNumber").value
+                },
+                {
+                    "type": {
+                        "text": "医保卡号码"
+                    },
+                    "value": document.getElementById("insuranceCard").value
+                }
+            ],
+            "name": [
+                {
+                    "family": document.getElementById("lastName").value,
+                    "given": [
+                        document.getElementById("firstName").value
+                    ]
+                }
+            ],
+            "telecom": [
+                {
+                    "value": document.getElementById("phoneNumber").value
+                }
+            ]
+        };
+        return patient;
+    }
+
+</script>
+
+</html>
