@@ -1,7 +1,7 @@
 {
     "objectscript.conn": {
         "server": "empidemo",
-        "ns": "DEMO",
+        "ns": "FHIRSERVER",
         "active": true
     }
 }

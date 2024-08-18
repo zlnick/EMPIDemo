@@ -139,7 +139,6 @@
             margin-top: 10px;
         }
     </style>
-    <!--<script src="./scripts/dist.js"> </script>-->
 </head>
 
 <body>
@@ -209,14 +208,14 @@
     </div>
 </body>
 <script>
-    const empiUrl = 'http://192.168.98.188/api/EMPI/Patient';
-    const fhirEndpoint = 'http://192.168.98.188/csp/healthshare/fhirserver/fhir/r4';
+    const empiUrl = 'http://localhost:52880/api/EMPI/Patient';
+    const fhirEndpoint = 'http://localhost:52880/csp/healthshare/fhirserver/fhir/r4';
     var similarPatients = [];
     var patientData;
     var patientSummary;
     //页面加载完成后先读存量的Embedded患者
     document.addEventListener('DOMContentLoaded', (event) => {
-        const apiUrl = 'http://192.168.98.188/api/EMPI/PatientIds';
+        const apiUrl = 'http://localhost:52880/api/EMPI/PatientIds';
 
         fetch(apiUrl)
             .then(response => {
@@ -444,6 +443,7 @@
                     console.log(key + ': ' + response.headers.get(key));
                 }
                 alert("患者"+patient.name[0].family+patient.name[0].given[0]+"信息保存成功")
+                hideModal()
                 return response; // 解析响应体为JSON  
             })
             .then(data => {

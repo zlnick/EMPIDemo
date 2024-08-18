@@ -1,2 +1,3 @@
 .DS_Store
-llm/
+image-iris/llm
+.vscode/settings.json

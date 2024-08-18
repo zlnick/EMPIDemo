@@ -1,30 +1,12 @@
 
-###
- # @Author: zlnick zlnick79@gmail.com
- # @Date: 2024-08-14 19:03:49
- # @LastEditors: zlnick zlnick79@gmail.com
- # @LastEditTime: 2024-08-15 16:31:55
- # @FilePath: \EMPIDemo\image-iris\src\init\init.sh
- # @Description: 
- # 
- # Copyright (c) 2024 by Lin Zhu, All Rights Reserved. 
-### 
-
-### 
-# DIR=$(dirname $0)
-# if [ "$DIR" = "." ]; then
-# DIR=$(pwd)
-# fi
-# iris-community login need no username and password
-
-# echo " Merge configuration..." 
-# iris merge iris /external/irismerge.conf /usr/irissys/iris.cpf
-
-iris session $ISC_PACKAGE_INSTANCENAME -U USER <<- EOF
+iris session $ISC_PACKAGE_INSTANCENAME -U %SYS <<- EOF
 do \$SYSTEM.OBJ.Load("/dur/init/WebTerminal-v4.9.5.xml", "cuk")
 do \$SYSTEM.OBJ.Load("/dur/init/zpm-0.7.0.xml", "cuk")
-zpm "version"
-write "zpm and webterminal installed"
+write "zpm, webterminal and FHIRServer installed"
+
+// Disable user password expiration as a demo platform
+zn "%SYS"
+do ##class(Security.Users).UnExpireUserPasswords("*")
 
 set ns="FHIRSERVER"
 zn "HSLIB"
@@ -50,24 +32,14 @@ set config = strategy.GetServiceConfigData()
 set config.DebugMode = 4
 do strategy.SaveServiceConfigData(config)
 
-// Disable user password expiration as a demo platform
-zn "%SYS"
-do ##class(Security.Users).UnExpireUserPasswords("*")
 
+
+zn ns
+zpm "version"
+zpm "load /dur/package/ -v":1:1
 
 exit
 halt
 EOF
-
-echo ""
-echo "Installation complete."
-echo ""
-
-echo "stop iris and purge unnecessary files..."
-iris stop $ISC_PACKAGE_INSTANCENAME quietly
-rm -rf $ISC_PACKAGE_INSTALLDIR/mgr/journal.log 
-rm -rf $ISC_PACKAGE_INSTALLDIR/mgr/IRIS.WIJ
-rm -rf $ISC_PACKAGE_INSTALLDIR/mgr/journal/*
-#rm -rf /dur/*
 
 exit 0

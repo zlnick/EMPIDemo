@@ -2,6 +2,11 @@
 Class EMPIDemo.DataFlow.FHIRHandler Extends Ens.BusinessProcessBPL
 {
 
+Storage Default
+{
+<Type>%Storage.Persistent</Type>
+}
+
 /// BPL Definition
 XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 {
@@ -36,6 +41,7 @@ XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 <request type='EMPIDemo.Messages.PostPatientRequest' >
 <assign property="callrequest.clientIP" value="request.Request.AdditionalInfo.GetAt(&quot;ClientAddr&quot;)" action="set" languageOverride="" />
 <assign property="callrequest.payload" value="context.payload" action="set" languageOverride="" />
+<assign property="callrequest.resourceId" value="response.Response.Id" action="set" languageOverride="" />
 </request>
 <response type='Ens.StringResponse' />
 </call>
@@ -43,11 +49,6 @@ XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 </if>
 </sequence>
 </process>
-}
-
-Storage Default
-{
-<Type>%Storage.Persistent</Type>
 }
 
 }

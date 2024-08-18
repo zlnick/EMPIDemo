@@ -7,9 +7,10 @@ COPY --chown=irisowner:irisowner --chmod=700 src /dur
 
 
 RUN find . -name '.DS_Store' -type f -delete
-RUN ISC_CPF_MERGE_FILE=/dur/init/merge.cpf iris start $ISC_PACKAGE_INSTANCENAME &&\
-    iris merge $ISC_PACKAGE_INSTANCENAME /dur/init/merge.cpf &&\
-    /dur/init/init.sh
+RUN iris start $ISC_PACKAGE_INSTANCENAME &&\
+    #iris merge $ISC_PACKAGE_INSTANCENAME /dur/init/merge.cpf &&\
+    /dur/init/init.sh &&\
+    /dur/init/startup.sh
 
 #RUN ISC_CPF_MERGE_FILE=/dur/merge/merge.cpf iris start $ISC_PACKAGE_INSTANCENAME &&\
     #iris merge $ISC_PACKAGE_INSTANCENAME /dur/merge/merge.cpf &&\

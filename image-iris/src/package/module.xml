@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="empidemo-deploy.ZPM">
+    <Module>
+      <Name>empidemo-deploy</Name>
+      <Version>0.1.0</Version>
+      <Description>患者主索引演示程序</Description>
+      <Keywords>empidemo</Keywords>
+      <Author>
+        <Person>China SE</Person>
+        <Organization>Intersytems China</Organization>
+        <CopyrightDate>20240829</CopyrightDate>
+        <License>MIT</License>
+        <Notes>患者主索引演示程序</Notes>
+      </Author>
+      <Packaging>module</Packaging>
+      <SourcesRoot>src</SourcesRoot>
+      <Resource Name="EMPIDemo.Util.PKG" />
+      <Resource Name="EMPIDemo.Model.PKG" />
+      <Resource Name="EMPIDemo.Messages.PKG" />
+      <Resource Name="EMPIDemo.Operation.PKG" />
+      <Resource Name="EMPIDemo.DataFlow.PKG" />
+      <Resource Name="EMPIDemo.REST.PKG" />
+      <Resource Name="EMPIDemo.Production.PKG" />
+      <SystemSetting Name="CSP.DefaultFileCharset" Value="UTF-8"/>
+      <CSPApplication 
+        Path="/api/EMPI"
+        Url="/api/EMPI"
+        CookiePath="/api/EMPI/"
+        PasswordAuthEnabled="1"
+        UnauthenticatedEnabled="1"
+        DispatchClass="EMPIDemo.REST.Service"
+        DefaultTimeout="900" 
+        MatchRoles=":%All" 
+        Recurse="1" 
+        ServeFiles="1"
+        ServeFilesTimeout="3600" 
+        UseSessionCookie="2" />
+      <CSPApplication
+        Url="/EMPIApp"
+        DeployPath="${cspdir}/EMPIApp"
+        SourcePath="/src/csp"
+        ServeFiles="1"
+        Recurse="1"
+        CookiePath="/EMPIApp"
+        UseCookies="2"
+        MatchRoles=":%All"
+        UnauthenticatedEnabled="1"
+       />
+    </Module>
+  </Document>
+</Export>
