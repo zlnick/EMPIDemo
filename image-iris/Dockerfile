@@ -1,6 +1,8 @@
 FROM containers.intersystems.com/intersystems/irishealth-community:2024.1
 USER irisowner
-RUN pip install -U sentence-transformers
+RUN pip install -U sentence-transformers 
+#Or, used this to replace pip package source in China
+#RUN pip install -U sentence-transformers -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 WORKDIR /dur
 COPY --chown=irisowner:irisowner --chmod=700 src /dur
