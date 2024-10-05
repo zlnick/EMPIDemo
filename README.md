@@ -6,7 +6,7 @@ This demo is referring to [sentence-transformers model](https://huggingface.co/m
 
 ## Installation
 1. Clone this repo
-2. [text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese) is referred in this demo, you can also download any sentence-transformers model you want, store it to a foldler, i.e, D:\Coding\EMPIDemo\image-iris\llm\text2vec-base-chinese in this demo, then change the directory in volumes section of the docker-compose.yml file.
+2. [text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese) is referred in this demo but not included because of it's size. You may want to download it to any directory on your local machine. i.e, D:\Coding\EMPIDemo\image-iris\llm\text2vec-base-chinese in this demo, then change the directory in volumes section of the docker-compose.yml file. Theoretically any other sentence-transformers model who can be ran alone should work too, while you may need to adjust the initiating parameters according to its document.
 3. Start the Docker container
 Please be aware that the program will download and install Python sentence-transformers module and also install a FHIR repository to store patient info, consequentely it will take about 15~16GB disk storage.
 
